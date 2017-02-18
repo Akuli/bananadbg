@@ -156,10 +156,10 @@ class DebugConsole(code.InteractiveConsole):
             if ok:
                 try:
                     self.run_command(commandname, args)
-                except Exception as e:
+                except Exception:
                     print("An exception occurred while running %s!"
                           % commandname, file=sys.stderr)
-                    traceback.print_exception(type(e), e, e.__traceback__)
+                    traceback.print_exc()
 
     def run_command(self, commandname, args):
         self.commands[commandname].func(self, *args)
@@ -248,6 +248,12 @@ def _setup_commands():
         if result.startswith('<') and result.endswith('>'):
             result = result[1:-1]
         print(result)
+
+    @DebugConsole.command
+    def src(console, expression):
+        """Evaluate the expression and print the source code of the result."""
+        obj = eval(expression, console.locals)
+        print(inspect.getsource(obj))
 
 
 _setup_commands()
